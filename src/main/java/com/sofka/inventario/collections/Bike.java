@@ -24,5 +24,7 @@ public class Bike {
     private String urlImage;
     @Field
     private Boolean state;
+    @Field
+    private Double precio;
 
 }

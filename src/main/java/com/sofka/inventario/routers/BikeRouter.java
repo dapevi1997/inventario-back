@@ -5,6 +5,7 @@ import com.sofka.inventario.model.BikeDTO;
 import com.sofka.inventario.usecases.CreateUseCase;
 import com.sofka.inventario.usecases.DeleteUseCase;
 import com.sofka.inventario.usecases.ListUseCase;
+import com.sofka.inventario.usecases.UpdateUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -134,5 +135,73 @@ public class BikeRouter {
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(BodyInserters.fromPublisher(deleteUseCase.apply(request.pathVariable("id")), Void.class))
         );
+    }
+
+    @RouterOperation(
+            path = "/getAllBikes",
+            produces ={
+                    MediaType.APPLICATION_JSON_VALUE
+            },
+            method = RequestMethod.GET,
+            beanClass = BikeRouter.class,
+            beanMethod = "listAllBikes",
+            operation = @Operation(
+                    operationId = "listAllBikes",
+                    responses = {
+                            @ApiResponse(
+                                    responseCode = "200",
+                                    description = "successful operation",
+                                    content = @Content(schema = @Schema(
+                                            implementation = Bike.class
+                                    ))
+                            )
+                    }
+            )
+    )
+    @Bean
+    public RouterFunction<ServerResponse> listAllBikes(ListUseCase listUseCase){
+        return route(GET("/getAllBikes"),
+                request -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(BodyInserters.fromPublisher(listUseCase.listAllBikes(), Bike.class))
+
+        ) ;
+    }
+
+    @RouterOperation(
+            path = "/updateBike",
+            produces ={
+                    MediaType.APPLICATION_JSON_VALUE
+            },
+            method = RequestMethod.PUT,
+            beanClass = BikeRouter.class,
+            beanMethod = "updateBike",
+            operation = @Operation(
+                    operationId = "updateBike",
+                    responses = {
+                            @ApiResponse(
+                                    responseCode = "200",
+                                    description = "successful operation",
+                                    content = @Content(schema = @Schema(
+                                            implementation = String.class
+                                    ))
+                            )
+                    },
+                    requestBody = @RequestBody(
+                            content = @Content(schema = @Schema(
+                                    implementation = Bike.class
+                            ))
+                    )
+            )
+    )
+    @Bean
+    public RouterFunction<ServerResponse> updateBike(UpdateUseCase updateUseCase){
+        Function<Bike, Mono<ServerResponse>> executor = bike -> updateUseCase.updateBike(bike)
+                .flatMap(result -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(result));
+
+        return route(PUT("/updateBike").and(accept(MediaType.APPLICATION_JSON)),
+                request -> request.bodyToMono(Bike.class).flatMap(executor));
     }
 }

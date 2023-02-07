@@ -1,2 +1,4 @@
-package com.sofka.inventario.usecases;public class LogicalDeleteUseCase {
+package com.sofka.inventario.usecases;
+
+public class LogicalDeleteUseCase {
 }

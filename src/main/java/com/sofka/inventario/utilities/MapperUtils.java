@@ -19,6 +19,7 @@ public class MapperUtils {
             bike.setMax(bikeDTO.getMax());
             bike.setUrlImage(bikeDTO.getUrlImage());
             bike.setState(bikeDTO.getState());
+            bike.setPrecio(bikeDTO.getPrecio());
             return bike;
         };
     }

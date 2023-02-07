@@ -18,4 +18,8 @@ public class ListUseCase {
         Pageable pageable = PageRequest.of(page,1);
         return bikeRepository.findAllByIdNotNullOrderByIdAsc(pageable);
     }
+
+    public Flux<Bike> listAllBikes(){
+        return bikeRepository.findAll();
+    }
 }
