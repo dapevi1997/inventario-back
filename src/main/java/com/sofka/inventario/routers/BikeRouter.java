@@ -2,10 +2,7 @@ package com.sofka.inventario.routers;
 
 import com.sofka.inventario.collections.Bike;
 import com.sofka.inventario.model.BikeDTO;
-import com.sofka.inventario.usecases.CreateUseCase;
-import com.sofka.inventario.usecases.DeleteUseCase;
-import com.sofka.inventario.usecases.ListUseCase;
-import com.sofka.inventario.usecases.UpdateUseCase;
+import com.sofka.inventario.usecases.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -203,5 +200,19 @@ public class BikeRouter {
 
         return route(PUT("/updateBike").and(accept(MediaType.APPLICATION_JSON)),
                 request -> request.bodyToMono(Bike.class).flatMap(executor));
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> logicDeleteBike(LogicalDeleteUseCase logicalDeleteUseCase){
+ /*       Function<String, Mono<ServerResponse>> executor = s -> logicalDeleteUseCase.logicDelete(s)
+                .flatMap(result -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(result));*/
+
+        return route(
+                PATCH("/logicDeleteBike/{id}"),
+                request -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                        .body(BodyInserters.fromPublisher(logicalDeleteUseCase.logicDelete(request.pathVariable("id")), Bike.class))
+        );
     }
 }
