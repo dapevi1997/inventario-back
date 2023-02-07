@@ -201,7 +201,7 @@ public class BikeRouter {
         return route(PUT("/updateBike").and(accept(MediaType.APPLICATION_JSON)),
                 request -> request.bodyToMono(Bike.class).flatMap(executor));
     }
-
+   //no está funcionando
     @Bean
     public RouterFunction<ServerResponse> logicDeleteBike(LogicalDeleteUseCase logicalDeleteUseCase){
  /*       Function<String, Mono<ServerResponse>> executor = s -> logicalDeleteUseCase.logicDelete(s)
@@ -213,6 +213,37 @@ public class BikeRouter {
                 PATCH("/logicDeleteBike/{id}"),
                 request -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
                         .body(BodyInserters.fromPublisher(logicalDeleteUseCase.logicDelete(request.pathVariable("id")), Bike.class))
+        );
+    }
+
+    @RouterOperation(
+            path = "/totalPages",
+            produces ={
+                    MediaType.APPLICATION_JSON_VALUE
+            },
+            method = RequestMethod.GET,
+            beanClass = BikeRouter.class,
+            beanMethod = "getTotalPage",
+            operation = @Operation(
+                    operationId = "getTotalPage",
+                    responses = {
+                            @ApiResponse(
+                                    responseCode = "200",
+                                    description = "successful operation",
+                                    content = @Content(schema = @Schema(
+                                            implementation = Integer.class
+                                    ))
+                            )
+                    }
+            )
+    )
+    @Bean
+    public RouterFunction<ServerResponse> getTotalPage(ListUseCase listUseCase){
+        return route(
+                GET("/totalPages"),
+                request -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(BodyInserters.fromPublisher(listUseCase.getTotalPages(), Integer.class))
         );
     }
 }

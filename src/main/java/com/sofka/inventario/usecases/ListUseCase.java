@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 @Data
@@ -21,5 +22,9 @@ public class ListUseCase {
 
     public Flux<Bike> listAllBikes(){
         return bikeRepository.findAll();
+    }
+
+    public Mono<Integer> getTotalPages(){
+        return bikeRepository.count().map(count -> (int)Math.ceil(count/1D));
     }
 }

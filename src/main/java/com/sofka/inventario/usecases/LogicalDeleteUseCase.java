@@ -19,7 +19,7 @@ public class LogicalDeleteUseCase {
         log.info(id);
         return  bikeRepository.findById(id)
                 .map(bike -> {
-                    bike.setState(false);
+                    bike.setState(Boolean.FALSE);
                     return bike;
                 });
     }
