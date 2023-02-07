@@ -1,7 +1,12 @@
 package com.sofka.inventario.repositories;
 
 import com.sofka.inventario.collections.Bike;
-import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 
-public interface BikeRepository extends ReactiveMongoRepository<Bike, String>{
+@Repository
+public interface BikeRepository extends ReactiveCrudRepository<Bike, String> {
+    Flux<Bike> findAllByIdNotNullOrderByIdAsc(final Pageable pageable);
 }
