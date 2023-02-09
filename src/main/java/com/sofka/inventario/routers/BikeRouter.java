@@ -246,4 +246,41 @@ public class BikeRouter {
                         .body(BodyInserters.fromPublisher(listUseCase.getTotalPages(), Integer.class))
         );
     }
+
+    @RouterOperation(
+            path = "/getBike/{id}",
+            produces ={
+                    MediaType.APPLICATION_JSON_VALUE
+            },
+            method = RequestMethod.GET,
+            beanClass = BikeRouter.class,
+            beanMethod = "getById",
+            operation = @Operation(
+                    operationId = "getById",
+                    responses = {
+                            @ApiResponse(
+                                    responseCode = "200",
+                                    description = "successful operation",
+                                    content = @Content(schema = @Schema(
+                                            implementation = BikeDTO.class
+                                    ))
+                            )
+                    },
+                    parameters = {
+                            @Parameter(in = ParameterIn.PATH, name = "id")
+                    }
+            )
+    )
+    @Bean
+    public RouterFunction<ServerResponse> getById(GetByIdUseCase getByIdUseCase){
+        return route(
+                GET("/getBike/{id}"),
+                request -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(BodyInserters.fromPublisher(
+                                getByIdUseCase.apply(request.pathVariable("id")),
+                                BikeDTO.class
+                        ))
+        );
+    }
 }

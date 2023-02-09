@@ -23,4 +23,17 @@ public class MapperUtils {
             return bike;
         };
     }
+
+    public Function<Bike, BikeDTO> mapEntityToBikeDTO(){
+        return entity -> new BikeDTO(
+                entity.getName(),
+                entity.getInInventory(),
+                entity.getEnabled(),
+                entity.getMin(),
+                entity.getMax(),
+                entity.getUrlImage(),
+                entity.getState(),
+                entity.getPrecio()
+        );
+    }
 }

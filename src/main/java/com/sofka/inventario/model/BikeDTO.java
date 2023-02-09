@@ -24,6 +24,17 @@ public class BikeDTO {
 
     private Double precio;
 
+    public BikeDTO(String name, Long inInventory, Boolean enabled, Long min, Long max, String urlImage, Boolean state, Double precio) {
+        this.name = name;
+        this.inInventory = inInventory;
+        this.enabled = enabled;
+        this.min = min;
+        this.max = max;
+        this.urlImage = urlImage;
+        this.state = state;
+        this.precio = precio;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
