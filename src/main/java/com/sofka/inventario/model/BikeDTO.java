@@ -1,11 +1,15 @@
 package com.sofka.inventario.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.Min;
 import java.util.Objects;
 
 
 @Data
+@AllArgsConstructor
 public class BikeDTO {
 
     private String name;
@@ -24,16 +28,6 @@ public class BikeDTO {
 
     private Double precio;
 
-    public BikeDTO(String name, Long inInventory, Boolean enabled, Long min, Long max, String urlImage, Boolean state, Double precio) {
-        this.name = name;
-        this.inInventory = inInventory;
-        this.enabled = enabled;
-        this.min = min;
-        this.max = max;
-        this.urlImage = urlImage;
-        this.state = state;
-        this.precio = precio;
-    }
 
     @Override
     public boolean equals(Object o) {

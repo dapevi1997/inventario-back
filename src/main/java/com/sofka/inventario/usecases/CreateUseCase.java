@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+
+
 @Service
 @Data
 public class CreateUseCase {
@@ -17,9 +19,10 @@ public class CreateUseCase {
     @Autowired
     private MapperUtils mapperUtils;
 
-    public Mono<Bike> saveBike(BikeDTO bikeDTO){
+    public Mono<Bike> saveBike( BikeDTO bikeDTO){
        Bike bike = mapperUtils.mapperToBike().apply(bikeDTO);
-        return bikeRepository.save(bike);
+        return bikeRepository
+                .save(bike);
     }
 
 }

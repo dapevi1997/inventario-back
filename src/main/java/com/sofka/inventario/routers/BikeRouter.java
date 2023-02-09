@@ -1,6 +1,7 @@
 package com.sofka.inventario.routers;
 
 import com.sofka.inventario.collections.Bike;
+import com.sofka.inventario.model.BadRequestModel;
 import com.sofka.inventario.model.BikeDTO;
 import com.sofka.inventario.usecases.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,12 +11,15 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.RouterOperation;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -27,6 +31,7 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
 @Configuration
+@Slf4j
 public class BikeRouter {
     @RouterOperation(
             path = "/createBike",
@@ -56,10 +61,18 @@ public class BikeRouter {
     )
     @Bean
     public RouterFunction<ServerResponse> createBike(CreateUseCase createUseCase){
+        BadRequestModel badRequestModel = new BadRequestModel("Debe ser 8");
+
         Function<BikeDTO, Mono<ServerResponse>> executor = bikeDTO -> createUseCase.saveBike(bikeDTO)
-                .flatMap(result -> ServerResponse.ok()
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(result));
+                .flatMap(result -> {
+                    if (result.getMin()<8){
+                        return ServerResponse.badRequest().contentType(MediaType.APPLICATION_JSON).bodyValue(new BadRequestModel("El número mínimo de unidades debe ser 8"));
+                    }
+                    log.info(String.valueOf(result));
+                    return ServerResponse.ok()
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .bodyValue(result);
+                });
 
 
         return route(
