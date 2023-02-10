@@ -3,12 +3,12 @@ package com.sofka.inventario.model;
 import lombok.Data;
 
 @Data
-public class ValidateBikeDTOModel {
+public class ValidateBikeModel {
 
     private Boolean isValid;
     private String message;
 
-    public ValidateBikeDTOModel(String message, Boolean isValid) {
+    public ValidateBikeModel(String message, Boolean isValid) {
         this.message = message;
         this.isValid = isValid;
     }

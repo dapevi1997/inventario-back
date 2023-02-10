@@ -2,7 +2,7 @@ package com.sofka.inventario.routers;
 
 import com.sofka.inventario.collections.Bike;
 import com.sofka.inventario.model.BikeDTO;
-import com.sofka.inventario.model.ValidateBikeDTOModel;
+import com.sofka.inventario.model.ValidateBikeModel;
 import com.sofka.inventario.usecases.*;
 import com.sofka.inventario.utilities.Validations;
 import io.swagger.v3.oas.annotations.Operation;
@@ -66,9 +66,9 @@ public class BikeRouter {
     public RouterFunction<ServerResponse> createBike(CreateUseCase createUseCase){
 
         Function<BikeDTO, Mono<ServerResponse>> executor = bikeDTO -> {
-            ValidateBikeDTOModel validateBikeDTOModel = validations.validateBikeDTO(bikeDTO);
-            if (!validateBikeDTOModel.getIsValid()){
-                return ServerResponse.badRequest().contentType(MediaType.APPLICATION_JSON).bodyValue(validateBikeDTOModel);
+            ValidateBikeModel validateBikeModel = validations.validateBikeDTO(bikeDTO);
+            if (!validateBikeModel.getIsValid()){
+                return ServerResponse.badRequest().contentType(MediaType.APPLICATION_JSON).bodyValue(validateBikeModel);
             }
 
             return createUseCase.saveBike(bikeDTO)
@@ -114,9 +114,18 @@ public class BikeRouter {
     @Bean
     @CrossOrigin(origins = "http://localhost:4200")
     public RouterFunction<ServerResponse> listBikePage(ListUseCase listUseCase){
-        return route(GET("/pagination/{page}"), request -> ServerResponse.ok()
+        return route(GET("/pagination/{page}"), request -> {
+            String page = request.pathVariable("page");
+            try {
+                Integer.parseInt(page);
+
+            }catch (Exception exception){
+                return ServerResponse.badRequest().contentType(MediaType.APPLICATION_JSON).bodyValue(new ValidateBikeModel("Verifique url",false));
+
+            }
+            return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromPublisher(listUseCase.listByPage(Integer.parseInt(request.pathVariable("page"))), Bike.class))
+                .body(BodyInserters.fromPublisher(listUseCase.listByPage(Integer.parseInt(page)), Bike.class));}
         );
     }
 
@@ -147,9 +156,17 @@ public class BikeRouter {
     public RouterFunction<ServerResponse> deleteBike(DeleteUseCase deleteUseCase){
         return route(
                 DELETE("/deleteBike/{id}").and(accept(MediaType.APPLICATION_JSON)),
-                request -> ServerResponse.accepted()
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(BodyInserters.fromPublisher(deleteUseCase.apply(request.pathVariable("id")), Void.class))
+                request -> {
+                    String id = request.pathVariable("id");
+
+
+                    if (id.equals("{id}")){
+                        return ServerResponse.badRequest().contentType(MediaType.APPLICATION_JSON).bodyValue(new ValidateBikeModel("Verifique url",false));
+                    }
+                    return ServerResponse.accepted()
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .body(BodyInserters.fromPublisher(deleteUseCase.apply(id), Void.class));
+                }
         );
     }
 
@@ -212,11 +229,16 @@ public class BikeRouter {
     )
     @Bean
     public RouterFunction<ServerResponse> updateBike(UpdateUseCase updateUseCase){
-        Function<Bike, Mono<ServerResponse>> executor = bike -> updateUseCase.updateBike(bike)
-                .flatMap(result -> ServerResponse.ok()
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(result));
-
+        Function<Bike, Mono<ServerResponse>> executor = bike -> {
+            ValidateBikeModel validateBikeModel = validations.validateBike(bike);
+            if (!validateBikeModel.getIsValid()){
+                return ServerResponse.badRequest().contentType(MediaType.APPLICATION_JSON).bodyValue(validateBikeModel);
+            }
+            return updateUseCase.updateBike(bike)
+                    .flatMap(result -> ServerResponse.ok()
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .bodyValue(result));
+        };
         return route(PUT("/updateBike").and(accept(MediaType.APPLICATION_JSON)),
                 request -> request.bodyToMono(Bike.class).flatMap(executor));
     }
@@ -280,12 +302,20 @@ public class BikeRouter {
     public RouterFunction<ServerResponse> getById(GetByIdUseCase getByIdUseCase){
         return route(
                 GET("/getBike/{id}"),
-                request -> ServerResponse.ok()
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(BodyInserters.fromPublisher(
-                                getByIdUseCase.apply(request.pathVariable("id")),
-                                Bike.class
-                        ))
+                request -> {
+                    String id = request.pathVariable("id");
+
+                    if (id.equals("{id}")){
+
+                        return ServerResponse.badRequest().contentType(MediaType.APPLICATION_JSON).bodyValue(new ValidateBikeModel("Verifique url",false));
+                    }
+                    return ServerResponse.ok()
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .body(BodyInserters.fromPublisher(
+                                    getByIdUseCase.apply(id),
+                                    Bike.class
+                            ));
+                }
         );
     }
 

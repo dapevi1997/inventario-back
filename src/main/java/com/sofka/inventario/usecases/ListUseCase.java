@@ -1,7 +1,6 @@
 package com.sofka.inventario.usecases;
 
 import com.sofka.inventario.collections.Bike;
-import com.sofka.inventario.model.BikeDTO;
 import com.sofka.inventario.repositories.BikeRepository;
 import com.sofka.inventario.utilities.MapperUtils;
 import lombok.Data;
