@@ -28,7 +28,7 @@ public class ListUseCase {
     }
 
     public Mono<Integer> getTotalPages(){
-        return bikeRepository.count().map(count -> (int)Math.ceil(count/1D));
+        return bikeRepository.count().map(count -> (int)Math.ceil(count/5D));
     }
 
     public Mono<Long> getTotalBikes(){
