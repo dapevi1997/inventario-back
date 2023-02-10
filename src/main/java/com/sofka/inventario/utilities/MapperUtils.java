@@ -18,7 +18,9 @@ public class MapperUtils {
             bike.setMin(bikeDTO.getMin());
             bike.setMax(bikeDTO.getMax());
             bike.setUrlImage(bikeDTO.getUrlImage());
-            bike.setState(bikeDTO.getState());
+            if(bikeDTO.getMin() < bikeDTO.getInInventory()){
+                bike.setState(true);
+            }else{bike.setState(false);}
             bike.setPrecio(bikeDTO.getPrecio());
             return bike;
         };
@@ -32,7 +34,6 @@ public class MapperUtils {
                 entity.getMin(),
                 entity.getMax(),
                 entity.getUrlImage(),
-                entity.getState(),
                 entity.getPrecio()
         );
     }

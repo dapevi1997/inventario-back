@@ -32,5 +32,9 @@ public class ListUseCase {
         return bikeRepository.count().map(count -> (int)Math.ceil(count/1D));
     }
 
+    public Mono<Long> getTotalBikes(){
+        return bikeRepository.findAll().count();
+    }
+
 
 }

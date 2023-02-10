@@ -1,9 +1,10 @@
 package com.sofka.inventario.routers;
 
 import com.sofka.inventario.collections.Bike;
-import com.sofka.inventario.model.BadRequestModel;
 import com.sofka.inventario.model.BikeDTO;
+import com.sofka.inventario.model.ValidateBikeDTOModel;
 import com.sofka.inventario.usecases.*;
+import com.sofka.inventario.utilities.Validations;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -13,13 +14,12 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.RouterOperation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
-import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -33,6 +33,9 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 @Configuration
 @Slf4j
 public class BikeRouter {
+    @Autowired
+    Validations validations;
+
     @RouterOperation(
             path = "/createBike",
             produces ={
@@ -61,18 +64,21 @@ public class BikeRouter {
     )
     @Bean
     public RouterFunction<ServerResponse> createBike(CreateUseCase createUseCase){
-        BadRequestModel badRequestModel = new BadRequestModel("Debe ser 8");
 
-        Function<BikeDTO, Mono<ServerResponse>> executor = bikeDTO -> createUseCase.saveBike(bikeDTO)
-                .flatMap(result -> {
-                    if (result.getMin()<8){
-                        return ServerResponse.badRequest().contentType(MediaType.APPLICATION_JSON).bodyValue(new BadRequestModel("El número mínimo de unidades debe ser 8"));
-                    }
-                    log.info(String.valueOf(result));
-                    return ServerResponse.ok()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .bodyValue(result);
-                });
+        Function<BikeDTO, Mono<ServerResponse>> executor = bikeDTO -> {
+            ValidateBikeDTOModel validateBikeDTOModel = validations.validateBikeDTO(bikeDTO);
+            if (!validateBikeDTOModel.getIsValid()){
+                return ServerResponse.badRequest().contentType(MediaType.APPLICATION_JSON).bodyValue(validateBikeDTOModel);
+            }
+
+            return createUseCase.saveBike(bikeDTO)
+                    .flatMap(result -> {
+
+                        return ServerResponse.ok()
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(result);
+                    });
+        };
 
 
         return route(
@@ -214,20 +220,6 @@ public class BikeRouter {
         return route(PUT("/updateBike").and(accept(MediaType.APPLICATION_JSON)),
                 request -> request.bodyToMono(Bike.class).flatMap(executor));
     }
-   //no está funcionando
-    @Bean
-    public RouterFunction<ServerResponse> logicDeleteBike(LogicalDeleteUseCase logicalDeleteUseCase){
- /*       Function<String, Mono<ServerResponse>> executor = s -> logicalDeleteUseCase.logicDelete(s)
-                .flatMap(result -> ServerResponse.ok()
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(result));*/
-
-        return route(
-                PATCH("/logicDeleteBike/{id}"),
-                request -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                        .body(BodyInserters.fromPublisher(logicalDeleteUseCase.logicDelete(request.pathVariable("id")), Bike.class))
-        );
-    }
 
     @RouterOperation(
             path = "/totalPages",
@@ -292,8 +284,39 @@ public class BikeRouter {
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(BodyInserters.fromPublisher(
                                 getByIdUseCase.apply(request.pathVariable("id")),
-                                BikeDTO.class
+                                Bike.class
                         ))
+        );
+    }
+
+    @RouterOperation(
+            path = "/countBikes",
+            produces ={
+                    MediaType.APPLICATION_JSON_VALUE
+            },
+            method = RequestMethod.GET,
+            beanClass = BikeRouter.class,
+            beanMethod = "getTotalBikes",
+            operation = @Operation(
+                    operationId = "getTotalBikes",
+                    responses = {
+                            @ApiResponse(
+                                    responseCode = "200",
+                                    description = "successful operation",
+                                    content = @Content(schema = @Schema(
+                                            implementation = Long.class
+                                    ))
+                            )
+                    }
+            )
+    )
+    @Bean
+    public RouterFunction<ServerResponse> getTotalBikes(ListUseCase listUseCase){
+        return route(
+                GET("/countBikes"),
+                request -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(BodyInserters.fromPublisher(listUseCase.getTotalBikes(), Long.class))
         );
     }
 }
