@@ -289,7 +289,7 @@ public class BikeRouter {
                                     responseCode = "200",
                                     description = "successful operation",
                                     content = @Content(schema = @Schema(
-                                            implementation = BikeDTO.class
+                                            implementation = Bike.class
                                     ))
                             )
                     },

@@ -19,7 +19,7 @@ public class ListUseCase {
     @Autowired
     private MapperUtils mapperUtils;
     public Flux<Bike> listByPage(int page){
-        Pageable pageable = PageRequest.of(page,1);
+        Pageable pageable = PageRequest.of(page,5);
         return bikeRepository.findAllByIdNotNullOrderByIdAsc(pageable);
     }
 
