@@ -10,6 +10,7 @@ import reactor.core.publisher.Mono;
 @Service
 @Data
 public class UpdateUseCase {
+
     @Autowired
     private BikeRepository bikeRepository;
     public Mono<String> updateBike(Bike bike){

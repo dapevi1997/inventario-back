@@ -13,6 +13,7 @@ public class DeleteUseCase {
     private BikeRepository bikeRepository;
 
     public Mono<Void> apply(String id){
+
         return bikeRepository.deleteById(id);
     }
 

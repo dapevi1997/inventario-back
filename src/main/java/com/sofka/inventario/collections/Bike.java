@@ -1,18 +1,18 @@
 package com.sofka.inventario.collections;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NonNull;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
-import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 
 
 @Document("bike")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Bike {
     @Id
     private String id;
