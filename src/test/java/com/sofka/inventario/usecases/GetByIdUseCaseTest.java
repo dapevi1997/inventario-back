@@ -5,6 +5,7 @@ import com.sofka.inventario.repositories.BikeRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import reactor.core.publisher.Mono;
@@ -19,6 +20,8 @@ class GetByIdUseCaseTest {
 
     @Mock
     BikeRepository bikeRepository;
+
+
 
     @Test
     void apply() {

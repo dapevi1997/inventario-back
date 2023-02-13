@@ -2,9 +2,11 @@ package com.sofka.inventario.usecases;
 
 import com.sofka.inventario.collections.Bike;
 import com.sofka.inventario.repositories.BikeRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import reactor.core.publisher.Mono;
@@ -13,6 +15,7 @@ import reactor.test.StepVerifier;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Slf4j
 class UpdateUseCaseTest {
 
     @SpyBean
@@ -27,12 +30,13 @@ class UpdateUseCaseTest {
 
 
         Bike bike = Mockito.mock(Bike.class);
-        Mockito.when(updateUseCase.updateBike(bike)).thenReturn(Mono.just("idBike"));
+        Mockito.when(bikeRepository.save(bike)).thenReturn(Mono.just(bikeToUpdate));
 
         StepVerifier.create(updateUseCase.updateBike(bikeToUpdate))
                 .expectNextMatches(id ->{
-                    assert id.equals("idBike");
+                    log.info(id);
+                    assert id.equals(bikeToUpdate.getId());
                     return true;
-        }).verifyComplete();
+        });
     }
 }
