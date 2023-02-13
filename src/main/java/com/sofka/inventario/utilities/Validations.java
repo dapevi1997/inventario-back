@@ -41,12 +41,12 @@ public class Validations {
         if(!isNotNull(bikeDTO.getMax())){
             return new ValidateBikeModel("Indique el número máximo disponible al público",false);
         }
-        if (bikeDTO.getMin()<8){
+/*        if (bikeDTO.getMin()<8){
             return new ValidateBikeModel("El número mínimo de unidades debe ser 8",false);
         }
         if (bikeDTO.getMax()>200){
             return new ValidateBikeModel("El número máximo de unidades por cliente debe ser máximo 200",false);
-        }
+        }*/
         if(!stringNotBlankAndNotNull(bikeDTO.getUrlImage())){
             return new ValidateBikeModel("La imágen es requerida",false);
         }
